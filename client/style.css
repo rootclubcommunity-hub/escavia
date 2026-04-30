@@ -1,0 +1,311 @@
+/* ─── ESCAVIA Timer — Shared Stylesheet ──────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* ─── Reset & Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #0a0b0f;
+  --bg-card:     #111318;
+  --bg-hover:    #181b23;
+  --border:      #1e2230;
+  --border-glow: #2a3050;
+
+  --accent:      #6c63ff;
+  --accent-dim:  #4b44cc;
+  --accent-glow: rgba(108, 99, 255, 0.2);
+
+  --text:        #eef0f8;
+  --text-dim:    #8a90aa;
+  --text-muted:  #555c75;
+
+  /* Status colors */
+  --idle:        #3a3f55;
+  --idle-text:   #8a90aa;
+  --running:     #10b981;
+  --running-glow:rgba(16, 185, 129, 0.25);
+  --paused:      #f59e0b;
+  --paused-glow: rgba(245, 158, 11, 0.25);
+  --stopped:     #ef4444;
+  --stopped-glow:rgba(239, 68, 68, 0.25);
+
+  --radius:  12px;
+  --radius-sm: 8px;
+  --shadow:  0 4px 24px rgba(0,0,0,0.4);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 3px; }
+
+/* ─── Typography Utilities ─────────────────────────────────────────────────── */
+.mono { font-family: 'JetBrains Mono', monospace; }
+.dim  { color: var(--text-dim); }
+.muted { color: var(--text-muted); }
+
+/* ─── Buttons ──────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-dim);
+  box-shadow: 0 0 16px var(--accent-glow);
+  transform: translateY(-1px);
+}
+.btn-start {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--running);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.btn-start:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 12px var(--running-glow);
+}
+.btn-pause {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--paused);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.btn-pause:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.25);
+  box-shadow: 0 0 12px var(--paused-glow);
+}
+.btn-stop {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--stopped);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.btn-stop:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.22);
+  box-shadow: 0 0 12px var(--stopped-glow);
+}
+.btn-reset {
+  background: rgba(255,255,255, 0.05);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.btn-reset:hover:not(:disabled) {
+  background: rgba(255,255,255, 0.1);
+  color: var(--text);
+}
+.btn-copy {
+  background: rgba(108, 99, 255, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  font-size: 0.75rem;
+  padding: 5px 12px;
+}
+.btn-copy:hover {
+  background: rgba(108, 99, 255, 0.22);
+}
+.btn-copy.copied {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--running);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+.btn-start-all {
+  background: var(--running);
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+  letter-spacing: 0.04em;
+}
+.btn-start-all:hover:not(:disabled) {
+  background: #0ea472;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.55);
+  transform: translateY(-1px);
+}
+.btn-start-all:disabled {
+  background: rgba(16, 185, 129, 0.3);
+  color: rgba(255,255,255,0.5);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ─── Inputs ───────────────────────────────────────────────────────────────── */
+.input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+}
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.input::placeholder { color: var(--text-muted); }
+
+/* ─── Status Badge ─────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.badge-idle    { background: rgba(58, 63, 85, 0.4);  color: var(--idle-text); }
+.badge-running { background: var(--running-glow);     color: var(--running); animation: pulse 2s infinite; }
+.badge-paused  { background: var(--paused-glow);      color: var(--paused); }
+.badge-stopped { background: var(--stopped-glow);     color: var(--stopped); }
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+/* ─── Auth Gate ────────────────────────────────────────────────────────────── */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #0d1020 0%, #070809 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: var(--shadow), 0 0 80px rgba(108, 99, 255, 0.08);
+  animation: slideUp 0.4s ease;
+}
+.auth-logo {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+}
+.auth-subtitle {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 32px;
+}
+.auth-card .input {
+  text-align: center;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 16px;
+}
+.auth-error {
+  color: var(--stopped);
+  font-size: 0.82rem;
+  margin-top: 10px;
+  min-height: 20px;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Page Header ──────────────────────────────────────────────────────────── */
+.page-header {
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.page-logo {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.page-tag {
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.header-spacer { flex: 1; }
+.connection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--stopped);
+  transition: background 0.3s;
+}
+.connection-dot.connected { background: var(--running); }
+.connection-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

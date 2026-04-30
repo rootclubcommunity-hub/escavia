@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESCAVIA — Team Timer</title>
+  <meta name="description" content="ESCAVIA live team timer for event contestants." />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ─── Contestant-specific styles ────────────────────────────────────── */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ─── Join Screen ──────────────────────────────────────────────────── */
+    .join-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(ellipse at 50% 40%, #0d1020 0%, #070809 100%);
+      z-index: 100;
+    }
+    .join-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow), 0 0 80px rgba(108, 99, 255, 0.07);
+      animation: slideUp 0.4s ease;
+    }
+    .join-logo {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .join-tagline {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      margin-bottom: 36px;
+    }
+    .join-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .join-card .input {
+      font-size: 1rem;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+    }
+    .join-error {
+      color: var(--stopped);
+      font-size: 0.82rem;
+      min-height: 20px;
+      margin-top: 4px;
+      text-align: center;
+    }
+    .join-connecting {
+      display: none;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-top: 8px;
+    }
+
+    /* ─── Timer Screen ─────────────────────────────────────────────────── */
+    .timer-screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 35%, #0e1125 0%, #070809 100%);
+      padding: 20px;
+      text-align: center;
+    }
+    .timer-screen.active { display: flex; }
+
+    /* Top branding */
+    .ts-brand {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ts-logo {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    /* Center */
+    .ts-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .ts-team-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .ts-timer {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(4rem, 18vw, 9rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: var(--text);
+      transition: color 0.5s ease;
+      /* Subtle glow on text */
+      text-shadow: 0 0 80px rgba(255,255,255,0.03);
+    }
+    .ts-timer.running { color: #fff; text-shadow: 0 0 40px rgba(16,185,129,0.2); }
+    .ts-timer.paused  { color: var(--paused); text-shadow: 0 0 40px var(--paused-glow); }
+    .ts-timer.stopped { color: var(--stopped); text-shadow: 0 0 40px var(--stopped-glow); }
+
+    .ts-status {
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Decorative ring */
+    .ts-ring {
+      position: absolute;
+      width: min(70vw, 500px);
+      height: min(70vw, 500px);
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.03);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ts-ring-inner {
+      position: absolute;
+      width: min(55vw, 400px);
+      height: min(55vw, 400px);
+      border-radius: 50%;
+      border: 1px solid rgba(108,99,255,0.06);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ts-center { position: relative; z-index: 1; }
+
+    /* Footer */
+    .ts-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 32px;
+      text-align: center;
+    }
+    .ts-footer p {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+
+    /* Connection badge top-right */
+    .ts-conn {
+      position: absolute;
+      top: 24px; right: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Reconnecting overlay */
+    .reconnect-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(245, 158, 11, 0.15);
+      border-bottom: 1px solid rgba(245,158,11,0.3);
+      color: var(--paused);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 8px;
+      z-index: 500;
+      transform: translateY(-100%);
+      transition: transform 0.3s;
+    }
+    .reconnect-banner.show { transform: translateY(0); }
+
+    @media (max-width: 480px) {
+      .join-card { padding: 36px 24px; }
+      .ts-brand { padding: 16px 20px; }
+      .ts-logo { font-size: 1.4rem; }
+      .ts-conn { top: 16px; right: 20px; }
+      .ts-footer { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Reconnecting Banner ───────────────────────────────────────────────── -->
+<div class="reconnect-banner" id="reconnectBanner">⚠ Connection lost — reconnecting…</div>
+
+<!-- ─── Join Screen ───────────────────────────────────────────────────────── -->
+<div class="join-screen" id="joinScreen">
+  <div class="join-card">
+    <div class="join-logo">ESCAVIA</div>
+    <div class="join-tagline">Enter your team name to view your live timer</div>
+    <label class="join-label" for="teamNameInput">Team Name</label>
+    <input
+      id="teamNameInput"
+      class="input"
+      type="text"
+      placeholder="e.g. Team Alpha"
+      maxlength="40"
+      autocomplete="off"
+    />
+    <button class="btn btn-primary" id="joinBtn" style="width:100%; padding:13px; font-size:0.92rem; margin-top:4px;">
+      Join My Team
+    </button>
+    <div class="join-error" id="joinError"></div>
+    <div class="join-connecting" id="joinConnecting">Connecting to event…</div>
+  </div>
+</div>
+
+<!-- ─── Timer Screen ──────────────────────────────────────────────────────── -->
+<div class="timer-screen" id="timerScreen">
+  <!-- Decorative rings -->
+  <div class="ts-ring"></div>
+  <div class="ts-ring-inner"></div>
+
+  <!-- Brand -->
+  <div class="ts-brand">
+    <div class="ts-logo">ESCAVIA</div>
+  </div>
+
+  <!-- Connection indicator top-right -->
+  <div class="ts-conn">
+    <div class="connection-dot" id="tsConnDot"></div>
+    <span class="connection-label" id="tsConnLabel">Live</span>
+  </div>
+
+  <!-- Center content -->
+  <div class="ts-center">
+    <div class="ts-team-name" id="tsTeamName">Team Name</div>
+    <div class="ts-timer mono idle" id="tsTimer">00:00:00</div>
+    <div class="ts-status" id="tsStatus"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="ts-footer">
+    <p>Contact the volunteers if you need to stop your time.</p>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="contestant.js"></script>
+</body>
+</html>
