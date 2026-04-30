@@ -67,7 +67,11 @@ setInterval(() => {
 const clientRoot = path.join(__dirname, '..', 'client');
 app.use(express.static(clientRoot));
 
-app.get(['/join', '/'], (req, res) => {
+app.get('/', (req, res) => {
+  res.sendFile(path.join(clientRoot, 'index.html'));
+});
+
+app.get('/join', (req, res) => {
   res.sendFile(path.join(clientRoot, 'contestant.html'));
 });
 
